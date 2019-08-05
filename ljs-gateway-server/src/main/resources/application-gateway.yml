@@ -1,18 +1,39 @@
-
 spring:
   cloud:
     gateway:
       routes:
-        - id: gateway-client1 #id是唯一的
-          #uri: lb://gateway-client #被代理的服务的uri
-          uri: http://localhost:9090
+        - id: manager-server
+          uri: lb://manager-server
           predicates:
-            - Path=/test/**
-            #- Cookie=test,123456
-            #- Method=POST
-            #- Header=test,(.*?)
-            #- Host=**.testhost.org
-            #- Query=ljs,xs
-            #- Weight=service,4
+            - Path=/api/manger/**
+          #- Method=POST
+          #- Cookie=test, yyyy
+          #- Header=token,(.*) #表示任意的字符
+          filters: #表示去掉api前缀
+            - StripPrefix=2
+        #             - name: RequestRateLimiter
+        #               args:
+        #                    keyResolver: "#{@myAddrReslover}"
+        #                    redis-rate-limiter.replenishRate: 1 #单位时间允许内执行请求的个数
+        #                    redis-rate-limiter.burstCapacity: 2 #单位时间内允许向桶中放入令牌的数量
+        - id: sso-server
+          #uri: lb://sso-server
+          uri: http://localhost:10010
+          predicates:
+            - Path=/sso/auth/**
+            - Cookie=authcode, (.*)
           filters:
-            - StripPrefix=1
+            - StripPrefix=2
+#         - id: SSO-SERVER2
+#           uri: lb://SSO-SERVER
+#           predicates:
+#           - Path=/
+#           filters:
+#             - StripPrefix=0
+#      globalcors:
+#        corsConfigurations:
+#          '[/**]':
+#            allowedOrigins: "https://localhost:10000"
+#            allowedMethods:
+#            - GET
+#            - POST

@@ -48,7 +48,10 @@ public class AuthController {
     public ResponseResult toLogin(@RequestBody Map<String,Object> map) throws LoginException {
         ResponseResult responseResult=ResponseResult.getResponseResult();
         //获取生成的验证码
+        String ss = map.get("codekey").toString();
+        System.out.println(ss);
         String code = redisTemplate.opsForValue().get(map.get("codekey").toString());
+        System.out.println(code);
         //获取传入的验证码是否是生成后存在redis中的验证码
         if(code==null||!code.equals(map.get("code").toString()) ){
             responseResult.setCode(500);
@@ -85,7 +88,7 @@ public class AuthController {
                     responseResult.setCode(200);
                     //设置成功信息
                     responseResult.setSuccess("登陆成功！^_^");
-
+                    System.out.println("===========--------------=============");
                     return responseResult;
                 }else{
                     throw new LoginException("用户名或密码错误");
@@ -127,24 +130,21 @@ public class AuthController {
     @RequestMapping("getCode")
     @ResponseBody
     public ResponseResult getCode(HttpServletRequest request, HttpServletResponse response){
-
         Cookie[] cookies = request.getCookies();
-
-        //生成一个长度是5的随机字符串
-        String code= VerifyCodeUtils.generateVerifyCode (5);
-        ResponseResult responseResult=ResponseResult.getResponseResult ();
-        responseResult.setResult ( code );
-        String uidCode="CODE"+ UID.getUUID16();
+        //生成一个长度为5的随机字符串
+        String code = VerifyCodeUtils.generateVerifyCode(5);
+        ResponseResult responseResult = ResponseResult.getResponseResult();
+        responseResult.setResult(code);
+        String uidCode = "CODE" + UID.getUUID16();
         //将生成的随机字符串标识后存入redis
         redisTemplate.opsForValue().set(uidCode,code);
         //设置过期时间
         redisTemplate.expire(uidCode,1,TimeUnit.MINUTES);
         //回写cookie
-        Cookie cookie=new Cookie("authcode",uidCode);
+        Cookie cookie = new Cookie("authcode", uidCode);
         cookie.setPath("/");
         cookie.setDomain("localhost");
         response.addCookie(cookie);
-
         return responseResult;
     }
 
@@ -152,21 +152,21 @@ public class AuthController {
      * 手动加载密码
      * @param args
      */
-    public static void main(String[] args) {
+    /*public static void main(String[] args) {
 
         System.out.println(MD5.encryptPassword("123456","lcg"));
 
-        /*Map<String,String> map=new HashMap<>();
+        *//*Map<String,String> map=new HashMap<>();
         map.put("id","645564654");
         String token = JWTUtils.generateToken(JSON.toJSONString(map));
 
-        System.out.println(token);*/
+        System.out.println(token);*//*
 
         JSONObject jsonObject = JWTUtils.decodeJwtTocken("eyJhbGciOiJIUzUxMiJ9.eyJjcmVhdGVkIjoxNTY0OTEzMzIzMzU4LCJleHAiOjE1NjQ5MTMzODMsInVzZXJpbmZvIjoie1wiaWRcIjpcIjY0NTU2NDY1NFwifSJ9.iT-NmNBkbjK29t4DLtyJvsAwp770QyYkUpEGB-Lmy-xDVH2NWUtPqQJmovV7PZV46IGPVUMvYMOAaEhbJ6voaA");
 
         System.out.println(jsonObject.get("id"));
 
-    }
+    }*/
 
 
 
