@@ -10,6 +10,10 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>ljs-gateway-server</module>
+        <module>ljs-pojo</module>
+        <module>ljs-commen</module>
+        <module>ljs-sso</module>
+        <module>ljs-manager</module>
     </modules>
 
     <dependencyManagement>
