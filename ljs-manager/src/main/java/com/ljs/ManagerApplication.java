@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @ClassName ManagerApplication
- * @Description: TODO
+ * @Description: 启动类
  * @Author 小松
  * @Date 2019/8/5
  **/
