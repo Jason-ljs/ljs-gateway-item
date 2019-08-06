@@ -83,7 +83,7 @@ public class MyGlobalFilter implements GlobalFilter {
             boolean isok=redisTemplate.opsForHash().hasKey("USERDATAAUTH"+userId,currentpath);
             //isok=true说明访问资源的权限
             if(isok){
-                ///验证当前路径不是需要进行登录校验的路径，直接放过
+                //验证当前路径不是需要进行登录校验的路径，直接放过
                 return chain.filter(exchange);
             }else{
                 throw new RuntimeException("不能访问该资源 !");
