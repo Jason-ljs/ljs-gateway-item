@@ -63,7 +63,7 @@ public class AuthController {
             UserInfo user = userService.getUserByLogin(map.get("loginname").toString());
             if (user != null) {
                 //比对密码
-                String password = MD5.encryptPassword(map.get("password").toString(), "lcg");
+                String password = MD5.encryptPassword(map.get("password").toString(), "ljs");
                 if (user.getPassword().equals(password)) {
 
                     //将用户信息转存为JSON串

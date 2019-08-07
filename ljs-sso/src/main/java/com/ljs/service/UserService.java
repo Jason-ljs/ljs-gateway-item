@@ -73,6 +73,7 @@ public class UserService {
                     for(MenuInfo menu:firstMenuInfo1){
                         authMap.put(menu.getUrl(),"");
                     }
+                    break;
                 }
 
                 //设置查出来的菜单到父级对象中

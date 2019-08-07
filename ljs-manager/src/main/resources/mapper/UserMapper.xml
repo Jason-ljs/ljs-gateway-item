@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ljs.dao.UserMapper">
+    <!--查询用户-->
+    <select id="findUser" resultType="userInfo">
+        select * from base_user
+        <where>
+            <if test="user != null and user != ''">
+                and userName like concat('%',#{user},'%')
+            </if>
+            <if test="sex != '全部'">
+                and sex=#{sex}
+            </if>
+            <if test="start != null and start != ''">
+                and createTime &gt; #{start}
+            </if>
+            <if test="end != null and end != ''">
+                and createTime &lt; #{end}
+            </if>
+        </where>
+    </select>
+
+    <!--添加用户-->
+    <insert id="addUser">
+        insert into base_user(userName,loginName,password,sex,tel,createTime,imgUrl)
+        values (#{userName},#{loginName},#{password},#{sex},#{tel},NOW(),#{imgUrl})
+    </insert>
+
+    <!--修改用户-->
+    <update id="updateUser">
+        update base_user
+        set
+          userName=#{userName},
+          loginName=#{loginName},
+          password=#{password},
+          sex=#{sex},
+          tel=#{tel},
+          createTime=now()
+          <if test="imgUrl != null and imgUrl != ''">
+              ,imgUrl=#{imgUrl}
+          </if>
+        where id=#{id}
+    </update>
+
+    <!--删除用户-->
+    <delete id="deleteUser">
+        delete from base_user where id=#{id}
+    </delete>
+
+    <!--从中间表中删除该用户的角色-->
+    <delete id="deleteRoleByUserId">
+        delete from base_user_role where userId=#{id}
+    </delete>
+</mapper>

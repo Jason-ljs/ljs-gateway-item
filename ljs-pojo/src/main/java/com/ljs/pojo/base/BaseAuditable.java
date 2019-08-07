@@ -20,6 +20,7 @@ public abstract class BaseAuditable {
 
     @Column(name="id")
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
     @LastModifiedDate

@@ -41,7 +41,7 @@ public class MyGlobalFilter implements GlobalFilter {
     private String loginpage;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
 
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -51,6 +51,7 @@ public class MyGlobalFilter implements GlobalFilter {
         ServerHttpResponse response = exchange.getResponse();
         //获取当前的请求路径
         String currentpath = request.getURI().toString();
+        System.out.println(currentpath);
 
         //验证当前路径是否是公共资源路径也就是不需要进行登录校验的路径
         List<String> strings = Arrays.asList(urls);
@@ -81,6 +82,7 @@ public class MyGlobalFilter implements GlobalFilter {
             String userId = jsonObject.get("id").toString();
             //校验用户有没有访问该资源的权限
             boolean isok=redisTemplate.opsForHash().hasKey("USERDATAAUTH"+userId,currentpath);
+            System.out.println(isok);
             //isok=true说明访问资源的权限
             if(isok){
                 //验证当前路径不是需要进行登录校验的路径，直接放过

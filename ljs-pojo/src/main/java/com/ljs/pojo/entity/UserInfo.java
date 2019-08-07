@@ -34,10 +34,13 @@ public class UserInfo extends BaseAuditable {
    private String tel;
 
     @Column(name = "sex")
-   private int sex;
+   private String sex;
 
     @Column(name = "parentId")
     private Long parentId;
+
+    @Column(name = "imgUrl")
+    private String imgUrl;
 
     @Transient
     private List<MenuInfo> listMenuInfo;
