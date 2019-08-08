@@ -1,6 +1,7 @@
 package com.ljs.dao;
 
 
+import com.ljs.pojo.entity.RoleInfo;
 import com.ljs.pojo.entity.UserInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -30,4 +31,14 @@ public interface UserMapper {
 
     //删除用户的角色
     public Integer deleteRoleByUserId(@Param("id") Long id);
+
+    //根据用户id查询该用户的所属角色
+    public RoleInfo findRoleInfoByUserId(@Param("id") Long id);
+
+    //修改用户角色(删除+添加)
+    //删除该用户角色
+    public Integer editRoleDel(@Param("uid") Long uid);
+    //添加该用户角色
+    public Integer editRoleAdd(@Param("uid") Long uid,@Param("rid") Long rid);
+
 }

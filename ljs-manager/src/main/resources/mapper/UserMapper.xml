@@ -52,4 +52,17 @@
     <delete id="deleteRoleByUserId">
         delete from base_user_role where userId=#{id}
     </delete>
+
+    <!-- 根据用户id查询该用户的所属角色 -->
+    <select id="findRoleInfoByUserId" resultType="roleInfo">
+      select br.* from base_user_role bur INNER JOIN base_role br ON bur.roleId=br.id where bur.userId=#{id}
+    </select>
+
+    <!-- 修改用户角色 -->
+    <delete id="editRoleDel">
+        delete from base_user_role where userId=#{uid}
+    </delete>
+    <insert id="editRoleAdd">
+        insert into base_user_role(userId,roleId) values(#{uid},#{rid})
+    </insert>
 </mapper>

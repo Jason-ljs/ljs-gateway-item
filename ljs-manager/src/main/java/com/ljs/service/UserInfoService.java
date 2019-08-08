@@ -7,6 +7,7 @@ import com.ljs.pojo.entity.UserInfo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 /**
  * @ClassName UserInfoService
@@ -32,7 +33,11 @@ public class UserInfoService {
      */
     public PageInfo<UserInfo> findUserInfo(String user, String sex, String start, String end, Integer page, Integer pageSize){
         PageHelper.startPage(page,pageSize);
-        PageInfo<UserInfo> userInfoPageInfo = new PageInfo<>(userMapper.findUser(user, start, end, sex));
+        List<UserInfo> userList = userMapper.findUser(user, start, end, sex);
+        for (UserInfo u : userList) {
+            u.setRoleInfo(userMapper.findRoleInfoByUserId(u.getId()));
+        }
+        PageInfo<UserInfo> userInfoPageInfo = new PageInfo<>(userList);
         System.out.println(userInfoPageInfo);
         return userInfoPageInfo;
     }
@@ -64,6 +69,11 @@ public class UserInfoService {
         //从中间表中删除该用户的角色
         userMapper.deleteRoleByUserId(id);
         return userMapper.deleteUser(id);
+    }
+
+    public Integer editRole(Long uid,Long rid){
+        userMapper.editRoleDel(uid);
+        return userMapper.editRoleAdd(uid,rid);
     }
 
 }

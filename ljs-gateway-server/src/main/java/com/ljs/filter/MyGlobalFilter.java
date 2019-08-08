@@ -88,7 +88,7 @@ public class MyGlobalFilter implements GlobalFilter {
                 //验证当前路径不是需要进行登录校验的路径，直接放过
                 return chain.filter(exchange);
             }else{
-                throw new RuntimeException("不能访问该资源 !");
+                throw new RuntimeException("您无此操作权限!");
             }
         }
     }

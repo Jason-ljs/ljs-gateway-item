@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ljs.dao.RoleMapper">
+    <!--查询权限-->
+    <select id="findRole" resultType="roleInfo">
+        select
+          br.*,group_concat(bu.userName) userNames
+        from
+          base_role br left join base_user_role bur on br.id=bur.userId
+            left join base_user bu on bu.id=bur.roleId
+        <where>
+            <if test="role != null and role != ''">
+                roleName like concat('%',#{role},'%')
+            </if>
+        </where>
+        group by br.id
+    </select>
+
+    <!--添加角色-->
+    <insert id="addRole">
+        insert into base_role(roleName,miaoShu,createTime)
+        values (#{roleName},#{miaoShu},NOW())
+    </insert>
+
+    <!--删除角色-->
+    <delete id="deleteRole">
+        delete from base_role where id=#{id}
+    </delete>
+
+</mapper>

@@ -7,6 +7,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +50,16 @@ public class UserInfo extends BaseAuditable {
     private RoleInfo roleInfo;
 
     @Transient
+    private List<RoleInfo> roleInfoList;
+
+    @Transient
     private Map<String,String> authmap;
 
+    @Transient
+    private String createTimeFormat;
+
+    public String getCreateTimeFormat() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return sdf.format(this.getCreateTime());
+    }
 }

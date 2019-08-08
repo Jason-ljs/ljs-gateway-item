@@ -5,6 +5,7 @@ import com.ljs.pojo.ResponseResult;
 import com.ljs.pojo.entity.UserInfo;
 import com.ljs.service.UserInfoService;
 import com.ljs.utils.MD5;
+import com.ljs.utils.UID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,6 +47,8 @@ public class UserController {
      */
     @RequestMapping("addUser")
     public ResponseResult addUser(@RequestBody UserInfo userInfo){
+        //给id赋值
+        userInfo.setId(UID.next());
         //加密密码
         userInfo.setPassword(MD5.encryptPassword(userInfo.getPassword(),"ljs"));
         ResponseResult responseResult = ResponseResult.getResponseResult();
@@ -94,10 +97,33 @@ public class UserController {
         return responseResult;
     }
 
+    /**
+     * 上传图片
+     * @param file
+     * @throws IOException
+     */
     @RequestMapping("upload")
     void upload(@RequestParam("file") MultipartFile file) throws IOException {
         String originalFilename = file.getOriginalFilename();
         file.transferTo(new File("D:/img/"+originalFilename));
+    }
+
+    /**
+     * 修改用户角色
+     * @param map
+     * @return
+     */
+    @RequestMapping("editRole")
+    public ResponseResult editRole(@RequestBody Map<String,Object> map){
+        System.out.println(map);
+        ResponseResult responseResult = ResponseResult.getResponseResult();
+        if(userInfoService.editRole(Long.valueOf(map.get("uid").toString()),Long.valueOf(map.get("rid").toString()))>0){
+            responseResult.setCode(200);
+            responseResult.setSuccess("修改用户角色成功");
+        }else {
+            responseResult.setCode(500);
+        }
+        return responseResult;
     }
 
 }

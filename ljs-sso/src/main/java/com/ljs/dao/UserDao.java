@@ -15,5 +15,4 @@ public interface UserDao extends JpaRepository<UserInfo,Long> {
     @Query(value = "select * from base_user where loginName=?1",nativeQuery = true)
     public UserInfo findByLoginName(String loginName);
 
-
 }

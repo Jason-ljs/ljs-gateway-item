@@ -34,8 +34,9 @@ public class UserService {
     public UserInfo getUserByLogin(String loginName){
         //获取用户信息
         UserInfo byLoginName = userDao.findByLoginName(loginName);
-
         if(byLoginName!=null){
+            //将所有角色赋值给用户
+            byLoginName.setRoleInfoList(roleDao.findAll());
             //获取用户的角色信息
             RoleInfo roleInfoByUserId = roleDao.forRoleInfoByUserId(byLoginName.getId());
             //设置用户的角色信息
@@ -65,15 +66,16 @@ public class UserService {
         for(MenuInfo menuInfo:firstMenuInfo){
             int leval=menuInfo.getLeval() + 1;
             //获取下级的菜单信息
-            List<MenuInfo> firstMenuInfo1 = menuDao.getFirstMenuInfo(roleId, leval);
+            List<MenuInfo> firstMenuInfo1 = menuDao.getFirstMenuInfo(roleId, leval, menuInfo.getId());
             if(firstMenuInfo1!=null){
 
                 //整理后台的数据访问链接
                 if(leval==4){
                     for(MenuInfo menu:firstMenuInfo1){
+                        System.out.println(menu.getUrl());
                         authMap.put(menu.getUrl(),"");
                     }
-                    break;
+//                    break;
                 }
 
                 //设置查出来的菜单到父级对象中

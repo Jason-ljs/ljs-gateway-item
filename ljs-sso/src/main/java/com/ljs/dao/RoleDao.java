@@ -4,6 +4,8 @@ import com.ljs.pojo.entity.RoleInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
+
 /**
  * @ClassName RoleDao
  * @Description: 权限持久层
