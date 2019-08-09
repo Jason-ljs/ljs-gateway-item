@@ -7,6 +7,7 @@ import com.ljs.pojo.entity.RoleInfo;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 
 /**
  * @ClassName RoleService
@@ -46,8 +47,26 @@ public class RoleService {
      * @param id
      * @return
      */
+    @Transactional
     public Integer deleteRole(Long id){
+        roleMapper.deleteRoleUser(id);
+        roleMapper.deleteRoleMenu(id);
         return roleMapper.deleteRole(id);
+    }
+
+    /**
+     * 编辑角色
+     * @param menuIds
+     * @param roleInfo
+     * @return
+     */
+    @Transactional
+    public Integer updateRole(String[] menuIds,RoleInfo roleInfo){
+        roleMapper.deleteRoleMenu(roleInfo.getId());
+        for (String menuId : menuIds) {
+            roleMapper.addRoleMenu(roleInfo.getId(),Long.valueOf(menuId));
+        }
+        return roleMapper.updateRole(roleInfo);
     }
 
 }

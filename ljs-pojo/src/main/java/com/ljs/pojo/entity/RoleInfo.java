@@ -29,4 +29,7 @@ public class RoleInfo extends BaseAuditable {
     @Transient
     private String userNames;
 
+    @Transient
+    private List<Long> menuList;
+
 }

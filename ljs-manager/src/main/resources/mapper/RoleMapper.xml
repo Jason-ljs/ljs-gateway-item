@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ljs.dao.RoleMapper">
-    <!--查询权限-->
+    <!--查询角色-->
     <select id="findRole" resultType="roleInfo">
         select
           br.*,group_concat(bu.userName) userNames
@@ -27,5 +27,26 @@
     <delete id="deleteRole">
         delete from base_role where id=#{id}
     </delete>
+    <!--删除角色与用户中间表-->
+    <delete id="deleteRoleUser">
+        delete from base_user_role where roleId=#{roleId}
+    </delete>
+    <!--删除角色与权限中间表-->
+    <delete id="deleteRoleMenu">
+        delete from base_role_menu where roleId=#{roleId}
+    </delete>
+
+    <insert id="addRoleMenu">
+        insert into base_role_menu(roleId,menuId) values(#{roleId},#{menuId})
+    </insert>
+    
+    <update id="updateRole">
+        update base_role
+        set
+          roleName=#{roleName},
+          miaoShu=#{miaoShu},
+          updateTime=NOW()
+        where id=#{id}
+    </update>
 
 </mapper>
