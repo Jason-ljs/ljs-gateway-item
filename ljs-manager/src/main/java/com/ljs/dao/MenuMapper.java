@@ -21,4 +21,16 @@ public interface MenuMapper {
     //根据角色id查询
     public List<Long> findMenuByRoleId(@Param("roleId") Long roleId);
 
+    //添加菜单
+    public Integer addMenu(MenuInfo menuInfo);
+
+    //修改菜单
+    public Integer updateMenu(MenuInfo menuInfo);
+
+    //删除菜单
+    public Integer deleteMenu(MenuInfo menuInfo);
+
+    //根据菜单ID删除菜单与角色中间表
+    public Integer deleteMenuRoleByMenuId(@Param("menuId") Long menuId);
+
 }

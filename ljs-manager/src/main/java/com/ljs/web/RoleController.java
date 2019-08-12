@@ -43,6 +43,11 @@ public class RoleController {
         return pageInfo;
     }
 
+    @RequestMapping("findRoleAll")
+    public List<RoleInfo> findRoleAll(){
+        return roleService.findRoleAll();
+    }
+
     /**
      * 新增角色
      * @param roleInfo

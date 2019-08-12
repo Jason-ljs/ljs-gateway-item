@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
+import java.util.List;
 
 /**
  * @ClassName RoleService
@@ -31,6 +32,14 @@ public class RoleService {
     public PageInfo<RoleInfo> findRole(String role,Integer page,Integer pageSize){
         PageHelper.startPage(page,pageSize);
         return new PageInfo<RoleInfo>(roleMapper.findRole(role));
+    }
+
+    /**
+     * 查询所有角色
+     * @return
+     */
+    public List<RoleInfo> findRoleAll(){
+        return roleMapper.findRoleAll();
     }
 
     /**

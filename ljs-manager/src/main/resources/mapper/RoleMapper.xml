@@ -17,6 +17,10 @@
         group by br.id
     </select>
 
+    <select id="findRoleAll" resultType="roleInfo">
+        select * from base_role
+    </select>
+
     <!--添加角色-->
     <insert id="addRole">
         insert into base_role(roleName,miaoShu,createTime)

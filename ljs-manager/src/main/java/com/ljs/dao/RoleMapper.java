@@ -19,6 +19,9 @@ public interface RoleMapper {
     //查询角色
     public List<RoleInfo> findRole(@Param("role") String role);
 
+    //查询所有角色
+    public List<RoleInfo> findRoleAll();
+
     //新增角色
     public Integer addRole(RoleInfo roleInfo);
 

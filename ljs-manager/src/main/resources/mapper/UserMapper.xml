@@ -21,10 +21,14 @@
         </where>
     </select>
 
+    <select id="findUserByLoginName" resultType="userInfo">
+        select * from base_user where loginName=#{loginName}
+    </select>
+
     <!--添加用户-->
     <insert id="addUser">
-        insert into base_user(userName,loginName,password,sex,tel,createTime,imgUrl)
-        values (#{userName},#{loginName},#{password},#{sex},#{tel},NOW(),#{imgUrl})
+        insert into base_user(id,userName,loginName,password,sex,tel,createTime,imgUrl)
+        values (#{id},#{userName},#{loginName},#{password},#{sex},#{tel},NOW(),#{imgUrl})
     </insert>
 
     <!--修改用户-->

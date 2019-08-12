@@ -3,7 +3,8 @@ spring:
     gateway:
       routes:
         - id: manager-server
-          uri: lb://manager-server
+#          uri: lb://manager-server
+          uri: http://localhost:10020
           predicates:
             - Path=/api/manger/**
           #- Method=POST

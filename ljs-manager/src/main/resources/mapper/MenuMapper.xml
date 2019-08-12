@@ -15,4 +15,26 @@
         where brm.roleId=#{roleId} and bm.leval=4
     </select>
 
+    <!-- 添加菜单 -->
+    <insert id="addMenu">
+      insert into base_menu(menuName,url,leval,parentId,createTime) values (#{menuName},#{url},#{leval},#{parentId},now())
+    </insert>
+
+    <!-- 修改菜单 -->
+    <update id="updateMenu">
+        update base_menu
+        set menuName=#{menuName},url=#{url}
+        where id=#{id}
+    </update>
+
+    <!-- 删除菜单 -->
+    <delete id="deleteMenu">
+        delete from base_menu where id=#{id}
+    </delete>
+
+    <!-- 根据菜单ID删除菜单与角色中间表 -->
+    <delete id="deleteMenuRoleByMenuId">
+        delete from base_role_menu where menuId=#{menuId}
+    </delete>
+
 </mapper>

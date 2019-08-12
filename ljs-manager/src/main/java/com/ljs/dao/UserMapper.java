@@ -20,6 +20,9 @@ public interface UserMapper {
     //查询用户
     public List<UserInfo> findUser(@Param("user") String user, @Param("start")String start,@Param("end") String end,@Param("sex") String sex);
 
+    //根据用户登录名查询
+    public UserInfo findUserByLoginName(@Param("loginName") String loginName);
+
     //增加用户
     public Integer addUser(UserInfo userInfo);
 

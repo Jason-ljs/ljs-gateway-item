@@ -61,4 +61,31 @@ public class MenuService {
         return menuMapper.findMenuByRoleId(roleId);
     }
 
+    /**
+     * 添加菜单
+     * @param menuInfo
+     * @return
+     */
+    public Integer addMenu(MenuInfo menuInfo){
+        return menuMapper.addMenu(menuInfo);
+    }
+
+    /**
+     * 修改菜单
+     * @param menuInfo
+     * @return
+     */
+    public Integer updateMenu(MenuInfo menuInfo){
+        return menuMapper.updateMenu(menuInfo);
+    }
+    /**
+     * 删除菜单
+     * @param menuInfo
+     * @return
+     */
+    public Integer deleteMenu(MenuInfo menuInfo){
+        menuMapper.deleteMenuRoleByMenuId(menuInfo.getId());
+        return menuMapper.deleteMenu(menuInfo);
+    }
+
 }

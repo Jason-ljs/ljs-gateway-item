@@ -42,6 +42,10 @@ public class UserInfoService {
         return userInfoPageInfo;
     }
 
+    public UserInfo findUserByLoginName(String loginName){
+        return userMapper.findUserByLoginName(loginName);
+    }
+
     /**
      * 添加用户
      * @param userInfo

@@ -10,6 +10,10 @@ import com.ljs.radom.VerifyCodeUtils;
 import com.ljs.service.UserService;
 import com.ljs.utils.MD5;
 import com.ljs.utils.UID;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
@@ -29,7 +33,9 @@ import java.util.concurrent.TimeUnit;
  * @Author 小松
  * @Date 2019/8/5
  **/
+@Api(value = "用户登录相关业务" ,tags = "用户登录相关")
 @Controller
+@RequestMapping("loginSwagger")
 public class AuthController {
 
     @Autowired
@@ -44,6 +50,27 @@ public class AuthController {
      * @param map
      * @return
      */
+    @ApiOperation(value = "登录业务",notes = "登录业务")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "codekey",
+                    required = true,
+                    dataType = "string",
+                    dataTypeClass = String.class
+            ),
+            @ApiImplicitParam(
+                    name = "loginname",
+                    required = true,
+                    dataType = "string",
+                    dataTypeClass = String.class
+            ),
+            @ApiImplicitParam(
+                    name = "password",
+                    required = true,
+                    dataType = "string",
+                    dataTypeClass = String.class
+            )
+    })
     @ResponseBody
     @RequestMapping("login")
     public ResponseResult toLogin(@RequestBody Map<String, Object> map) throws LoginException {
@@ -71,6 +98,8 @@ public class AuthController {
 
                     //将用户信息使用JWt进行加密，将加密信息作为票据
                     String token = JWTUtils.generateToken(userinfo);
+
+                    System.out.println(token);
 
                     //将加密信息存入statuInfo
                     responseResult.setToken(token);
@@ -101,6 +130,13 @@ public class AuthController {
     }
 
 
+    @ApiOperation(value = "退出业务",notes = "退出业务")
+    @ApiImplicitParam(
+            name = "id",
+            required = true,
+            dataType = "long",
+            dataTypeClass = Long.class
+    )
     @ResponseBody
     @RequestMapping("loginout")
     public ResponseResult loginout(Integer id) {
@@ -139,6 +175,7 @@ public class AuthController {
      *
      * @return
      */
+    @ApiOperation(value = "获取滑动验证的验证码",notes = "获取滑动验证的验证码")
     @RequestMapping("getCode")
     @ResponseBody
     public ResponseResult getCode(HttpServletRequest request, HttpServletResponse response) {
