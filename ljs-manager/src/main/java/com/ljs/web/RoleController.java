@@ -6,11 +6,16 @@ import com.ljs.pojo.entity.MenuInfo;
 import com.ljs.pojo.entity.RoleInfo;
 import com.ljs.service.MenuService;
 import com.ljs.service.RoleService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.reflect.Array;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +26,7 @@ import java.util.Map;
  * @Date 2019/8/8
  **/
 @RestController
+@Api(value = "角色相关业务" ,tags = "角色操作相关")
 public class RoleController {
 
     @Autowired
@@ -34,18 +40,40 @@ public class RoleController {
      * @param map
      * @return
      */
+    @ApiOperation(value = "查询角色", notes = "查询角色")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "role",
+                    required = true,
+                    dataType = "string",
+                    dataTypeClass = String.class
+            ),
+            @ApiImplicitParam(
+                    name = "page",
+                    required = true,
+                    dataType = "integer",
+                    dataTypeClass = Integer.class
+            ),
+            @ApiImplicitParam(
+                    name = "pageSize",
+                    required = true,
+                    dataType = "integer",
+                    dataTypeClass = Integer.class
+            )
+    })
     @RequestMapping("findRole")
     public PageInfo<RoleInfo> findRole(@RequestBody Map<String,String> map){
-        PageInfo<RoleInfo> pageInfo = roleService.findRole(map.get("role"), Integer.valueOf(map.get("page")), Integer.valueOf(map.get("pageSize")));
+        PageInfo<RoleInfo> pageInfo = roleService.findRole(Integer.valueOf(map.get("leval")),map.get("role"), Integer.valueOf(map.get("page")), Integer.valueOf(map.get("pageSize")));
         pageInfo.getList().forEach(role->{
             role.setMenuList(menuService.findMenuByRoleId(role.getId()));
         });
         return pageInfo;
     }
 
+    @ApiOperation(value = "查询全部角色", notes = "查询全部角色")
     @RequestMapping("findRoleAll")
-    public List<RoleInfo> findRoleAll(){
-        return roleService.findRoleAll();
+    public List<RoleInfo> findRoleAll(@RequestBody Map<String,String> map){
+        return roleService.findRoleAll(Integer.valueOf(map.get("leval")));
     }
 
     /**
@@ -53,6 +81,13 @@ public class RoleController {
      * @param roleInfo
      * @return
      */
+    @ApiOperation(value = "新增角色", notes = "新增角色")
+    @ApiImplicitParam(
+            name = "roleInfo",
+            required = true,
+            dataType = "roleInfo",
+            dataTypeClass = RoleInfo.class
+    )
     @RequestMapping("addRole")
     public ResponseResult addRole(@RequestBody RoleInfo roleInfo){
         ResponseResult responseResult = ResponseResult.getResponseResult();
@@ -71,9 +106,21 @@ public class RoleController {
      * @param map
      * @return
      */
+    @ApiOperation(value = "删除角色", notes = "删除角色")
+    @ApiImplicitParam(
+            name = "id",
+            required = true,
+            dataType = "long",
+            dataTypeClass = Long.class
+    )
     @RequestMapping("deleteRole")
     public ResponseResult deleteRole(@RequestBody Map<String,Object> map){
         ResponseResult responseResult = ResponseResult.getResponseResult();
+        if(roleService.findUserListByRoleId(Long.valueOf(map.get("id").toString())).size()>0){
+            responseResult.setCode(500);
+            responseResult.setError("已绑定用户，不可删除");
+            return responseResult;
+        }
         if(roleService.deleteRole(Long.valueOf(map.get("id").toString()))>0){
             responseResult.setCode(200);
             responseResult.setSuccess("删除角色成功");
@@ -85,18 +132,34 @@ public class RoleController {
     }
 
     /**
-     * 查询所有权限
+     * 根据角色等级查询所有权限
      * @return
      */
+    @ApiOperation(value = "根据角色等级查询所有权限", notes = "根据角色等级查询所有权限")
     @RequestMapping("findMenuList")
-    public List<MenuInfo> findMenuList(){
-        return menuService.findMenu();
+    public List<MenuInfo> findMenuList(@RequestBody Map<String,String> map){
+        return menuService.findMenu(Integer.valueOf(map.get("roleId")));
     }
 
     /**
      * 编辑角色
      * @return
      */
+    @ApiOperation(value = "编辑角色", notes = "编辑角色")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "ids",
+                    required = true,
+                    dataType = "array",
+                    dataTypeClass = Array.class
+            ),
+            @ApiImplicitParam(
+                    name = "role",
+                    required = true,
+                    dataType = "role",
+                    dataTypeClass = RoleInfo.class
+            )
+    })
     @RequestMapping("updateRole")
     public ResponseResult updateRole(@RequestBody Map<String,Object> map){
         ResponseResult responseResult = ResponseResult.getResponseResult();

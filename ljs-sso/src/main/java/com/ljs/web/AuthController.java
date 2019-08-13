@@ -35,7 +35,6 @@ import java.util.concurrent.TimeUnit;
  **/
 @Api(value = "用户登录相关业务" ,tags = "用户登录相关")
 @Controller
-@RequestMapping("loginSwagger")
 public class AuthController {
 
     @Autowired

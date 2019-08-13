@@ -8,17 +8,18 @@
           br.*,group_concat(bu.userName) userNames
         from
           base_role br left join base_user_role bur on br.id=bur.userId
-            left join base_user bu on bu.id=bur.roleId
+            left join base_user bu on bu.id=bur.roleId and br.leval > #{leval}
         <where>
             <if test="role != null and role != ''">
-                roleName like concat('%',#{role},'%')
+                and roleName like concat('%',#{role},'%')
             </if>
         </where>
         group by br.id
     </select>
 
+    <!-- 查询全部角色 -->
     <select id="findRoleAll" resultType="roleInfo">
-        select * from base_role
+        select * from base_role where leval > #{leval} order by id
     </select>
 
     <!--添加角色-->
@@ -52,5 +53,9 @@
           updateTime=NOW()
         where id=#{id}
     </update>
+    
+    <select id="findUserListByRoleId" resultType="userInfo">
+        select bu.* from base_user bu left join base_user_role bur on bu.id=bur.userId where bur.roleId=#{roleId}
+    </select>
 
 </mapper>

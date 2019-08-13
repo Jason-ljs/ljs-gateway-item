@@ -23,10 +23,10 @@ public class MenuService {
      * 查询全部权限
      * @return
      */
-    public List<MenuInfo> findMenu(){
-        List<MenuInfo> menuInfoList = menuMapper.findMenu(1,0L);
+    public List<MenuInfo> findMenu(Integer roleId){
+        List<MenuInfo> menuInfoList = menuMapper.findMenu(1,0L,roleId);
         //递归填充子列表
-        this.getForMenuInfo(menuInfoList);
+        this.getForMenuInfo(menuInfoList,roleId);
         return menuInfoList;
     }
 
@@ -34,17 +34,17 @@ public class MenuService {
      * 递归查询
      * @param menuInfoList
      */
-    public void getForMenuInfo(List<MenuInfo> menuInfoList){
+    public void getForMenuInfo(List<MenuInfo> menuInfoList,Integer roleId){
 
         for(MenuInfo menuInfo:menuInfoList){
             int leval=menuInfo.getLeval() + 1;
             //获取下级的菜单信息
-            List<MenuInfo> firstMenuInfo1 = menuMapper.findMenu(leval, menuInfo.getId());
+            List<MenuInfo> firstMenuInfo1 = menuMapper.findMenu(leval, menuInfo.getId(),roleId);
             if(firstMenuInfo1!=null){
                 //设置查出来的菜单到父级对象中
                 menuInfo.setMenuInfoList(firstMenuInfo1);
                 //根据查出来的下级菜单继续查询该菜单包含的子菜单
-                getForMenuInfo(firstMenuInfo1);
+                getForMenuInfo(firstMenuInfo1,roleId);
             }else{
                 break;
             }

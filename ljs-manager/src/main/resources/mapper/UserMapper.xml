@@ -19,6 +19,7 @@
                 and createTime &lt; #{end}
             </if>
         </where>
+        order by id desc
     </select>
 
     <select id="findUserByLoginName" resultType="userInfo">

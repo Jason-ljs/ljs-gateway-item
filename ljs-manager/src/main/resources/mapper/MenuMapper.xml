@@ -5,7 +5,10 @@
 
     <!-- 查询权限列表 -->
     <select id="findMenu" resultType="menuInfo">
-      select * from base_menu where leval=#{leval} and parentId=#{pid}
+      select bm.* from base_menu bm
+          left join base_role_menu brm on bm.id=brm.menuId
+          left join base_role br on br.id=brm.roleId
+        where bm.leval=#{leval} and bm.parentId=#{pid} and br.id=#{roleId}
     </select>
 
     <!-- 根据角色id查询 -->

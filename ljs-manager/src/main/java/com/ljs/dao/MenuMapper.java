@@ -16,7 +16,7 @@ import java.util.List;
 public interface MenuMapper {
 
     //查询权限列表
-    public List<MenuInfo> findMenu(@Param("leval")Integer leval,@Param("pid") Long pid);
+    public List<MenuInfo> findMenu(@Param("leval")Integer leval,@Param("pid") Long pid,@Param("roleId") Integer roleId);
 
     //根据角色id查询
     public List<Long> findMenuByRoleId(@Param("roleId") Long roleId);

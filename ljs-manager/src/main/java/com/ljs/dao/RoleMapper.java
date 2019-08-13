@@ -2,6 +2,7 @@ package com.ljs.dao;
 
 import com.ljs.pojo.entity.MenuInfo;
 import com.ljs.pojo.entity.RoleInfo;
+import com.ljs.pojo.entity.UserInfo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -17,10 +18,10 @@ import java.util.List;
 public interface RoleMapper {
 
     //查询角色
-    public List<RoleInfo> findRole(@Param("role") String role);
+    public List<RoleInfo> findRole(@Param("leval") Integer leval,@Param("role") String role);
 
     //查询所有角色
-    public List<RoleInfo> findRoleAll();
+    public List<RoleInfo> findRoleAll(@Param("leval") Integer leval);
 
     //新增角色
     public Integer addRole(RoleInfo roleInfo);
@@ -37,5 +38,8 @@ public interface RoleMapper {
 
     //修改角色信息
     public Integer updateRole(Object roleInfo);
+
+    //根据角色id查询所绑定的用户
+    public List<UserInfo> findUserListByRoleId(@Param("roleId") Long roleId);
 
 }

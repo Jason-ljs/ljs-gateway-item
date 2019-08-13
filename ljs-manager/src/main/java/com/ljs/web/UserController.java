@@ -7,6 +7,7 @@ import com.ljs.pojo.entity.UserInfo;
 import com.ljs.service.UserInfoService;
 import com.ljs.utils.MD5;
 import com.ljs.utils.UID;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
@@ -29,8 +30,8 @@ import java.util.Map;
  * @Author 小松
  * @Date 2019/8/7
  **/
-@RequestMapping("userSwagger")
 @RestController
+@Api(value = "用户相关业务" ,tags = "用户操作相关")
 public class UserController {
 
     @Autowired
@@ -196,7 +197,7 @@ public class UserController {
         File fileImg = new File(filePath);
         file.transferTo(fileImg);
         //可自定义大小    实现缩略图功能
-        Thumbnails.of(filePath).scale(0.25f).toFile(fileImg.getAbsolutePath() + "_25%.jpg");
+        Thumbnails.of(filePath).scale(0.25f).toFile(fileImg.getAbsolutePath() + "_sl.jpg");
     }
 
     /**
