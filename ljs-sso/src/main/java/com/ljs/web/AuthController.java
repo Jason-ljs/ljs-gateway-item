@@ -1,8 +1,6 @@
 package com.ljs.web;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.ljs.exception.LoginException;
 import com.ljs.jwt.JWTUtils;
@@ -11,6 +9,7 @@ import com.ljs.pojo.entity.UserInfo;
 import com.ljs.radom.VerifyCodeUtils;
 import com.ljs.service.UserService;
 import com.ljs.utils.MD5;
+import com.ljs.utils.MailUtil;
 import com.ljs.utils.SmsUtil;
 import com.ljs.utils.UID;
 import io.swagger.annotations.Api;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -31,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,7 +38,7 @@ import java.util.concurrent.TimeUnit;
  * @Author 小松
  * @Date 2019/8/5
  **/
-@Api(value = "用户登录相关业务" ,tags = "用户登录相关")
+@Api(value = "用户登录相关业务", tags = "用户登录相关")
 @Controller
 public class AuthController {
 
@@ -55,7 +54,7 @@ public class AuthController {
      * @param map
      * @return
      */
-    @ApiOperation(value = "登录业务",notes = "登录业务")
+    @ApiOperation(value = "登录业务", notes = "登录业务")
     @ApiImplicitParams({
             @ApiImplicitParam(
                     name = "codekey",
@@ -120,12 +119,18 @@ public class AuthController {
                     //每日用户活跃量折线图使用
                     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                     String format = simpleDateFormat.format(new Date());
-                    if(redisTemplate.hasKey(format)){
-                        redisTemplate.opsForValue().set(format,Integer.valueOf(redisTemplate.opsForValue().get(format)).toString());
-                    }else{
-                        redisTemplate.opsForValue().set(format,"1");
+                    String hasKey = user.getLoginName() + format;
+                    if (!redisTemplate.hasKey(hasKey)) {
+                        redisTemplate.opsForValue().set(hasKey, "");
+                        redisTemplate.expire(hasKey, 1, TimeUnit.DAYS);
+                        if (redisTemplate.hasKey(format)) {
+                            Integer integer = Integer.valueOf(redisTemplate.opsForValue().get(format)) + 1;
+                            redisTemplate.opsForValue().set(format, integer.toString());
+                        } else {
+                            redisTemplate.opsForValue().set(format, "1");
+                        }
+                        redisTemplate.expire(format, 30, TimeUnit.DAYS);
                     }
-                    redisTemplate.expire(format,30,TimeUnit.DAYS);
 
                     //设置返回值
                     responseResult.setResult(user);
@@ -150,18 +155,19 @@ public class AuthController {
 
     /**
      * 短信验证登录
+     *
      * @param map
      * @return
      */
     @ResponseBody
     @RequestMapping("smsLogin")
-    public ResponseResult smsLogin(@RequestBody Map<String,String> map){
+    public ResponseResult smsLogin(@RequestBody Map<String, String> map) {
         ResponseResult responseResult = ResponseResult.getResponseResult();
         UserInfo user = userService.getUserByTel(map.get("phoneNumber"));
-        if(user != null){
+        if (user != null) {
             String code = map.get("code");
             String redisCode = redisTemplate.opsForValue().get("CODE" + code);
-            if(code.equals(redisCode)){
+            if (code.equals(redisCode)) {
                 //将用户信息转存为JSON串
                 String userinfo = JSON.toJSONString(user);
 
@@ -184,12 +190,18 @@ public class AuthController {
                 //每日用户活跃量折线图使用
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 String format = simpleDateFormat.format(new Date());
-                if(redisTemplate.hasKey(format)){
-                    redisTemplate.opsForValue().set(format,Integer.valueOf(redisTemplate.opsForValue().get(format)).toString());
-                }else{
-                    redisTemplate.opsForValue().set(format,"1");
+                String hasKey = user.getLoginName() + format;
+                if (!redisTemplate.hasKey(hasKey)) {
+                    redisTemplate.opsForValue().set(hasKey, "");
+                    redisTemplate.expire(hasKey, 1, TimeUnit.DAYS);
+                    if (redisTemplate.hasKey(format)) {
+                        Integer integer = Integer.valueOf(redisTemplate.opsForValue().get(format)) + 1;
+                        redisTemplate.opsForValue().set(format, integer.toString());
+                    } else {
+                        redisTemplate.opsForValue().set(format, "1");
+                    }
+                    redisTemplate.expire(format, 30, TimeUnit.DAYS);
                 }
-                redisTemplate.expire(format,30,TimeUnit.DAYS);
 
                 //设置返回值
                 responseResult.setResult(user);
@@ -197,11 +209,11 @@ public class AuthController {
                 //设置成功信息
                 responseResult.setSuccess("登陆成功！^_^");
                 return responseResult;
-            }else {
+            } else {
                 responseResult.setError("验证码超时!");
                 return responseResult;
             }
-        }else{
+        } else {
             responseResult.setError("手机号未注册!");
             return responseResult;
         }
@@ -209,24 +221,25 @@ public class AuthController {
 
     /**
      * 获取短信验证码
+     *
      * @param request
      * @param response
      * @return
      */
     @ResponseBody
     @RequestMapping("getSmsCode")
-    public ResponseResult getSmsCode(HttpServletRequest request, HttpServletResponse response,@RequestBody Map<String,String> map) throws ClientException {
+    public ResponseResult getSmsCode(HttpServletRequest request, HttpServletResponse response, @RequestBody Map<String, String> map) throws ClientException {
         UserInfo user = userService.getUserByTel(map.get("phoneNumber"));
         System.out.println(user);
         ResponseResult responseResult = ResponseResult.getResponseResult();
-        if(user != null){
+        if (user != null) {
             //生成一个长度为4的随机字符串
             String code = SmsUtil.getCode();
             String status = SmsUtil.sendSms(map.get("phoneNumber"), code);
-            if(status.equals("OK")){
+            if (status.equals("OK")) {
                 Cookie[] cookies = request.getCookies();
                 responseResult.setResult(code);
-                String uidCode = "CODE"+code;
+                String uidCode = "CODE" + code;
                 //将生成的随机字符串标识后存入redis
                 redisTemplate.opsForValue().set(uidCode, code);
                 //设置过期时间
@@ -238,11 +251,11 @@ public class AuthController {
                 response.addCookie(cookie);
                 responseResult.setCode(200);
                 return responseResult;
-            }else {
+            } else {
                 responseResult.setError("验证码发送失败");
                 return responseResult;
             }
-        }else{
+        } else {
             responseResult.setError("手机号未注册！");
             return responseResult;
         }
@@ -250,7 +263,7 @@ public class AuthController {
     }
 
 
-    @ApiOperation(value = "退出业务",notes = "退出业务")
+    @ApiOperation(value = "退出业务", notes = "退出业务")
     @ApiImplicitParam(
             name = "id",
             required = true,
@@ -295,7 +308,7 @@ public class AuthController {
      *
      * @return
      */
-    @ApiOperation(value = "获取滑动验证的验证码",notes = "获取滑动验证的验证码")
+    @ApiOperation(value = "获取滑动验证的验证码", notes = "获取滑动验证的验证码")
     @RequestMapping("getCode")
     @ResponseBody
     public ResponseResult getCode(HttpServletRequest request, HttpServletResponse response) {
@@ -319,7 +332,7 @@ public class AuthController {
 
     /**
      * 手动加载密码
-     * @param args
+     * @param
      */
     /*public static void main(String[] args) {
 
@@ -337,5 +350,53 @@ public class AuthController {
 
     }*/
 
+    /**
+     * 发送邮件
+     *
+     * @param map
+     * @return
+     */
+    @RequestMapping("sendMail")
+    @ResponseBody
+    public ResponseResult sendMail(@RequestBody Map<String, String> map) {
+        ResponseResult responseResult = ResponseResult.getResponseResult();
+        UserInfo byLogin = userService.getUserByLogin(map.get("account"));
+        UserInfo byTel = userService.getUserByTel(map.get("account"));
+        if (byLogin != null || byTel != null) {
+            String code = UUID.randomUUID().toString();
+            if (byLogin.getEmail() != null) {
+                new Thread(new MailUtil(byLogin.getEmail(), code)).start();
+                userService.updateCodeById(byLogin.getId(), code);
+                redisTemplate.opsForValue().set(code, "");
+                redisTemplate.expire(code, 60, TimeUnit.MINUTES);
+                responseResult.setCode(200);
+            } else if (byTel.getEmail() != null) {
+                new Thread(new MailUtil(byTel.getEmail(), code)).start();
+                userService.updateCodeById(byTel.getId(), code);
+                redisTemplate.opsForValue().set(code, "");
+                redisTemplate.expire(code, 60, TimeUnit.MINUTES);
+                responseResult.setCode(200);
+            } else {
+                responseResult.setCode(300);
+            }
+        } else {
+            responseResult.setCode(500);
+        }
+        return responseResult;
+    }
+
+    @RequestMapping("resetPwd")
+    @ResponseBody
+    public ResponseResult resetPwd(@RequestBody Map<String, String> map) {
+        ResponseResult responseResult = ResponseResult.getResponseResult();
+        UserInfo byCode = userService.findUserByCode(map.get("code"));
+        if (redisTemplate.hasKey(map.get("code"))) {
+            userService.updatePasswordByCode(MD5.encryptPassword(map.get("password"),"ljs"),map.get("code"));
+            responseResult.setCode(200);
+        } else {
+            responseResult.setCode(500);
+        }
+        return responseResult;
+    }
 
 }

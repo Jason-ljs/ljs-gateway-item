@@ -42,6 +42,11 @@ public class UserInfoService {
         return userInfoPageInfo;
     }
 
+    /**
+     * 根据登录名查询用户
+     * @param loginName
+     * @return
+     */
     public UserInfo findUserByLoginName(String loginName){
         return userMapper.findUserByLoginName(loginName);
     }

@@ -124,4 +124,31 @@ public class UserService {
 
     }
 
+    /**
+     * 根据code码查询用户
+     * @param code
+     * @return
+     */
+    public UserInfo findUserByCode(String code){
+        return userDao.findUserByCode(code);
+    }
+
+    /**
+     * 根据code码更改用户密码
+     * @param password
+     * @param code
+     */
+    public void updatePasswordByCode(String password,String code){
+        userDao.updatePasswordByCode(password,code);
+    }
+
+    /**
+     * 根据用户ID修改code码
+     * @param id
+     * @param code
+     */
+    public void updateCodeById(Long id,String code){
+        userDao.updateCodeById(id,code);
+    }
+
 }

@@ -58,8 +58,14 @@ public class UserInfo extends BaseAuditable {
     @Transient
     private String createTimeFormat;
 
+    @Transient
     public String getCreateTimeFormat() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         return sdf.format(this.getCreateTime());
     }
+
+    private String code;
+
+    private String email;
+
 }

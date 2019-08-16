@@ -27,12 +27,25 @@ public class SmsUtil {
      */
     public static String sendSms(String phoneNumber, String code) {
 
+        //AccessKeyId
+        String accessKeyId = "LTAIJi0Zhw2rVPHs";
+
+        //AccessKeySecret
+        String secret = "4yW5YQGvt1yeWUiVQpOzInRoHDI2HS";
+
+        //短信签名
+        String signName = "JasonItem";
+
+        //短信模板
+        String templateCode = "SMS_172357028";
+
+
         //设置超时时间
         System.setProperty("sun.net.client.defaultConnectTimeout", "10000");
         System.setProperty("sun.net.client.defaultReadTimeout", "10000");
 
         // 初始化acsClient
-        IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", "LTAIDuOpBOYMYaq1","GhiewgoFQ3BnqaiPLyLTyfmVBPhKgV");
+        IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId,secret);
         try {
             DefaultProfile.addEndpoint("cn-hangzhou","cn-hangzhou", "Dysmsapi", "dysmsapi.aliyuncs.com");
         } catch (ClientException e) {
@@ -47,9 +60,9 @@ public class SmsUtil {
         // 必填:待发送手机号
         request.setPhoneNumbers(phoneNumber);
         // 必填:短信签名-可在短信控制台中找到
-        request.setSignName("JasonItem");
+        request.setSignName(signName);
         // 必填:短信模板-可在短信控制台中找到
-        request.setTemplateCode("SMS_172357028");
+        request.setTemplateCode(templateCode);
         // 可选:模板中的变量替换JSON串,如模板内容为"亲爱的用户,您的验证码为${code}"时,此处的值为
         request.setTemplateParam("{\"code\":\"" + code + "\"}");
         SendSmsResponse sendSmsResponse = null;

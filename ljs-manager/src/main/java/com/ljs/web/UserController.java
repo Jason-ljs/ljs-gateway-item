@@ -4,7 +4,7 @@ import com.github.pagehelper.PageInfo;
 import com.github.tobato.fastdfs.domain.StorePath;
 import com.github.tobato.fastdfs.domain.ThumbImageConfig;
 import com.github.tobato.fastdfs.service.FastFileStorageClient;
-import com.ljs.excel.UserEcxcelUtils;
+import com.ljs.config.UserEcxcelUtils;
 import com.ljs.pojo.ResponseResult;
 import com.ljs.pojo.entity.UserInfo;
 import com.ljs.service.UserInfoService;
@@ -43,8 +43,6 @@ public class UserController {
 
     @Autowired
     UserInfoService userInfoService;
-
-    List<UserInfo> list = null;
 
     @Autowired
     private ThumbImageConfig thumbImageConfig;
@@ -291,14 +289,17 @@ public class UserController {
         return map;
     }
 
-//    @RequestMapping("uploadExcel")
-//    public void uploadExcel() throws IOException {
-//        list = null;
-//        File file = new File("D:\\biao\\POI测试.xls");
-//        UserEcxcelUtils.importExcel(file,list);
-//        list.forEach(userInfo -> {
-//            System.out.println(userInfo);
-//        });
-//    }
+    /**
+     * 批量添加
+     * @param file
+     * @throws IOException
+     */
+    @RequestMapping("uploadExcel")
+    public void uploadExcel(@RequestParam("file") MultipartFile file) throws IOException {
+        List<UserInfo> list = UserEcxcelUtils.importExcel(file.getInputStream());
+        list.forEach(userInfo -> {
+            userInfoService.addUser(userInfo);
+        });
+    }
 
 }
