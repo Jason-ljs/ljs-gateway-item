@@ -31,6 +31,41 @@ public class UserService {
     @Autowired
     private MenuDao menuDao;
 
+    /**
+     * 根据手机号登录
+     * @param tel
+     * @return
+     */
+    public UserInfo getUserByTel(String tel){
+        //获取用户信息
+        UserInfo byLoginName = userDao.findUserByTel(tel);
+        if(byLoginName!=null){
+            //将所有角色赋值给用户
+            byLoginName.setRoleInfoList(roleDao.findAll());
+            //获取用户的角色信息
+            RoleInfo roleInfoByUserId = roleDao.forRoleInfoByUserId(byLoginName.getId());
+            //设置用户的角色信息
+            byLoginName.setRoleInfo(roleInfoByUserId);
+
+            if(roleInfoByUserId!=null){
+                //获取用户的权限信息
+                List<MenuInfo> firstMenuInfo = menuDao.getFirstMenuInfo(roleInfoByUserId.getId(), 1);
+                //递归的查询子菜单权限
+                Map<String,String> authMap=new Hashtable<>();
+                this.getForMenuInfo(firstMenuInfo,roleInfoByUserId.getId(),authMap);
+                //设置菜单的子权限
+                byLoginName.setAuthmap(authMap);
+                byLoginName.setListMenuInfo(firstMenuInfo);
+            }
+        }
+        return byLoginName;
+    }
+
+    /**
+     * 根据用户名密码登录
+     * @param loginName
+     * @return
+     */
     public UserInfo getUserByLogin(String loginName){
         //获取用户信息
         UserInfo byLoginName = userDao.findByLoginName(loginName);

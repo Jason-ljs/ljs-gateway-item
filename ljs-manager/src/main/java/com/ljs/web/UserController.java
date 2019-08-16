@@ -1,6 +1,9 @@
 package com.ljs.web;
 
 import com.github.pagehelper.PageInfo;
+import com.github.tobato.fastdfs.domain.StorePath;
+import com.github.tobato.fastdfs.domain.ThumbImageConfig;
+import com.github.tobato.fastdfs.service.FastFileStorageClient;
 import com.ljs.excel.UserEcxcelUtils;
 import com.ljs.pojo.ResponseResult;
 import com.ljs.pojo.entity.UserInfo;
@@ -13,6 +16,7 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,9 +24,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @ClassName UserController
@@ -38,6 +45,15 @@ public class UserController {
     UserInfoService userInfoService;
 
     List<UserInfo> list = null;
+
+    @Autowired
+    private ThumbImageConfig thumbImageConfig;
+
+    @Autowired
+    private FastFileStorageClient storageClient;
+
+    @Autowired
+    private RedisTemplate<String,String> redisTemplate;
 
     /**
      * 查询用户
@@ -200,6 +216,22 @@ public class UserController {
         Thumbnails.of(filePath).scale(0.25f).toFile(fileImg.getAbsolutePath() + "_sl.jpg");
     }
 
+    @RequestMapping("test")
+    public void test() throws FileNotFoundException {
+        File file = new File("D:\\IMG\\此电脑.png_sl.jpg");
+
+        StorePath storePath = this.storageClient.uploadImageAndCrtThumbImage(
+
+                new FileInputStream(file), file.length(), "png", null);
+
+        System.out.println(storePath.getFullPath());
+
+        String path = thumbImageConfig.getThumbImagePath(storePath.getPath());
+
+        System.out.println(path.substring(0,path.lastIndexOf("_")));
+
+    }
+
     /**
      * 修改用户角色
      *
@@ -232,6 +264,31 @@ public class UserController {
             responseResult.setCode(500);
         }
         return responseResult;
+    }
+
+    /**
+     * 给折线图赋值
+     * @return
+     */
+    @RequestMapping("opinionData")
+    public Map<String,Object> opinionData() throws ParseException {
+        Set<String> keys = redisTemplate.keys("2019-*");
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Set<Date> treeSet = new TreeSet();
+        for (String str : keys) {
+            treeSet.add(simpleDateFormat.parse(str));
+        }
+        List<String> xList = new ArrayList<>();
+        List<String> yList = new ArrayList<>();
+        for (Date key : treeSet) {
+            String value = redisTemplate.opsForValue().get(simpleDateFormat.format(key));
+            xList.add(simpleDateFormat.format(key));
+            yList.add(value);
+        }
+        Map<String,Object> map = new HashMap<>();
+        map.put("xList",xList);
+        map.put("yList",yList);
+        return map;
     }
 
 //    @RequestMapping("uploadExcel")

@@ -2,6 +2,8 @@ package com.ljs.web;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
+import com.aliyuncs.exceptions.ClientException;
 import com.ljs.exception.LoginException;
 import com.ljs.jwt.JWTUtils;
 import com.ljs.pojo.ResponseResult;
@@ -9,6 +11,7 @@ import com.ljs.pojo.entity.UserInfo;
 import com.ljs.radom.VerifyCodeUtils;
 import com.ljs.service.UserService;
 import com.ljs.utils.MD5;
+import com.ljs.utils.SmsUtil;
 import com.ljs.utils.UID;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -20,10 +23,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -110,6 +116,17 @@ public class AuthController {
 
                     //设置token过期 30分钟
                     redisTemplate.expire("USERINFO" + user.getId().toString(), 600, TimeUnit.SECONDS);
+
+                    //每日用户活跃量折线图使用
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                    String format = simpleDateFormat.format(new Date());
+                    if(redisTemplate.hasKey(format)){
+                        redisTemplate.opsForValue().set(format,Integer.valueOf(redisTemplate.opsForValue().get(format)).toString());
+                    }else{
+                        redisTemplate.opsForValue().set(format,"1");
+                    }
+                    redisTemplate.expire(format,30,TimeUnit.DAYS);
+
                     //设置返回值
                     responseResult.setResult(user);
                     responseResult.setCode(200);
@@ -117,13 +134,117 @@ public class AuthController {
                     responseResult.setSuccess("登陆成功！^_^");
                     return responseResult;
                 } else {
-                    throw new LoginException("用户名或密码错误");
+                    responseResult.setError("用户名或密码错误");
+                    return responseResult;
                 }
             } else {
-                throw new LoginException("用户名或密码错误");
+                responseResult.setError("用户名或密码错误");
+                return responseResult;
             }
         } else {
-            throw new LoginException("用户名或密码错误");
+            responseResult.setError("用户名或密码错误");
+            return responseResult;
+        }
+
+    }
+
+    /**
+     * 短信验证登录
+     * @param map
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("smsLogin")
+    public ResponseResult smsLogin(@RequestBody Map<String,String> map){
+        ResponseResult responseResult = ResponseResult.getResponseResult();
+        UserInfo user = userService.getUserByTel(map.get("phoneNumber"));
+        if(user != null){
+            String code = map.get("code");
+            String redisCode = redisTemplate.opsForValue().get("CODE" + code);
+            if(code.equals(redisCode)){
+                //将用户信息转存为JSON串
+                String userinfo = JSON.toJSONString(user);
+
+                //将用户信息使用JWt进行加密，将加密信息作为票据
+                String token = JWTUtils.generateToken(userinfo);
+
+                System.out.println(token);
+
+                //将加密信息存入statuInfo
+                responseResult.setToken(token);
+
+                //将生成的token存储到redis库
+                redisTemplate.opsForValue().set("USERINFO" + user.getId().toString(), token);
+                //将该用户的数据访问权限信息存入缓存中
+                redisTemplate.opsForHash().putAll("USERDATAAUTH" + user.getId().toString(), user.getAuthmap());
+
+                //设置token过期 30分钟
+                redisTemplate.expire("USERINFO" + user.getId().toString(), 600, TimeUnit.SECONDS);
+
+                //每日用户活跃量折线图使用
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                String format = simpleDateFormat.format(new Date());
+                if(redisTemplate.hasKey(format)){
+                    redisTemplate.opsForValue().set(format,Integer.valueOf(redisTemplate.opsForValue().get(format)).toString());
+                }else{
+                    redisTemplate.opsForValue().set(format,"1");
+                }
+                redisTemplate.expire(format,30,TimeUnit.DAYS);
+
+                //设置返回值
+                responseResult.setResult(user);
+                responseResult.setCode(200);
+                //设置成功信息
+                responseResult.setSuccess("登陆成功！^_^");
+                return responseResult;
+            }else {
+                responseResult.setError("验证码超时!");
+                return responseResult;
+            }
+        }else{
+            responseResult.setError("手机号未注册!");
+            return responseResult;
+        }
+    }
+
+    /**
+     * 获取短信验证码
+     * @param request
+     * @param response
+     * @return
+     */
+    @ResponseBody
+    @RequestMapping("getSmsCode")
+    public ResponseResult getSmsCode(HttpServletRequest request, HttpServletResponse response,@RequestBody Map<String,String> map) throws ClientException {
+        UserInfo user = userService.getUserByTel(map.get("phoneNumber"));
+        System.out.println(user);
+        ResponseResult responseResult = ResponseResult.getResponseResult();
+        if(user != null){
+            //生成一个长度为4的随机字符串
+            String code = SmsUtil.getCode();
+            String status = SmsUtil.sendSms(map.get("phoneNumber"), code);
+            if(status.equals("OK")){
+                Cookie[] cookies = request.getCookies();
+                responseResult.setResult(code);
+                String uidCode = "CODE"+code;
+                //将生成的随机字符串标识后存入redis
+                redisTemplate.opsForValue().set(uidCode, code);
+                //设置过期时间
+                redisTemplate.expire(uidCode, 50, TimeUnit.MINUTES);
+                //回写cookie
+                Cookie cookie = new Cookie("authcode", uidCode);
+                cookie.setPath("/");
+                cookie.setDomain("localhost");
+                response.addCookie(cookie);
+                responseResult.setCode(200);
+                return responseResult;
+            }else {
+                responseResult.setError("验证码发送失败");
+                return responseResult;
+            }
+        }else{
+            responseResult.setError("手机号未注册！");
+            return responseResult;
         }
 
     }
