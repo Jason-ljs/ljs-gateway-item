@@ -362,24 +362,27 @@ public class AuthController {
         ResponseResult responseResult = ResponseResult.getResponseResult();
         UserInfo byLogin = userService.getUserByLogin(map.get("account"));
         UserInfo byTel = userService.getUserByTel(map.get("account"));
-        if (byLogin != null || byTel != null) {
+        UserInfo byEmail = userService.getUserByEmail(map.get("account"));
             String code = UUID.randomUUID().toString();
-            if (byLogin.getEmail() != null) {
+            if (byLogin != null) {
                 new Thread(new MailUtil(byLogin.getEmail(), code)).start();
                 userService.updateCodeById(byLogin.getId(), code);
                 redisTemplate.opsForValue().set(code, "");
                 redisTemplate.expire(code, 60, TimeUnit.MINUTES);
                 responseResult.setCode(200);
-            } else if (byTel.getEmail() != null) {
+            } else if (byTel != null) {
                 new Thread(new MailUtil(byTel.getEmail(), code)).start();
                 userService.updateCodeById(byTel.getId(), code);
                 redisTemplate.opsForValue().set(code, "");
                 redisTemplate.expire(code, 60, TimeUnit.MINUTES);
                 responseResult.setCode(200);
+            } else if (byEmail != null){
+                new Thread(new MailUtil(byEmail.getEmail(), code)).start();
+                userService.updateCodeById(byEmail.getId(), code);
+                redisTemplate.opsForValue().set(code, "");
+                redisTemplate.expire(code, 60, TimeUnit.MINUTES);
+                responseResult.setCode(200);
             } else {
-                responseResult.setCode(300);
-            }
-        } else {
             responseResult.setCode(500);
         }
         return responseResult;

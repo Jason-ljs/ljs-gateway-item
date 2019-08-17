@@ -124,6 +124,10 @@ public class UserService {
 
     }
 
+    public UserInfo getUserByEmail(String email){
+        return userDao.findUserByEmail(email);
+    }
+
     /**
      * 根据code码查询用户
      * @param code
@@ -148,7 +152,7 @@ public class UserService {
      * @param code
      */
     public void updateCodeById(Long id,String code){
-        userDao.updateCodeById(id,code);
+        userDao.updateCodeById(code,id);
     }
 
 }

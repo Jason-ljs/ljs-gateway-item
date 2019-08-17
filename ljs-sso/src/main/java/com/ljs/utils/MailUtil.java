@@ -57,9 +57,9 @@ public class MailUtil implements Runnable {
             // 2.2设置接收人
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
             // 2.3设置邮件主题
-            message.setSubject("密码找回");
+            message.setSubject("Jason平台安全中心【密码找回】");
             // 2.4设置邮件内容
-            String content = "<html><head></head><body><h1>这是一封密码找回邮件,更改密码请点击以下链接</h1><h3><a href='http://localhost:8080/reset_pwd?code="
+            String content = "<html><head></head><body><h1>【Jason平台安全中心】这是一封密码找回邮件,更改密码请点击以下链接,本链接30分钟内有效(请勿回复)</h1><h3><a href='http://localhost:8080/reset_pwd?code="
                     + code + "'>http://localhost:8080/reset_pwd?code=" + code
                     + "</href></h3></body></html>";
             message.setContent(content, "text/html;charset=UTF-8");
