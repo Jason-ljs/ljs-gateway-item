@@ -52,6 +52,24 @@ public class UserInfoService {
     }
 
     /**
+     * 根据手机号查询用户
+     * @param tel
+     * @return
+     */
+    public UserInfo findUserByTel(String tel){
+        return userMapper.findUserByTel(tel);
+    }
+
+    /**
+     * 根据邮箱账号查询用户
+     * @param email
+     * @return
+     */
+    public UserInfo findUserByEmail(String email){
+        return userMapper.findUserByEmail(email);
+    }
+
+    /**
      * 添加用户
      * @param userInfo
      * @return
@@ -80,6 +98,12 @@ public class UserInfoService {
         return userMapper.deleteUser(id);
     }
 
+    /**
+     * 修改用户与角色的关系
+     * @param uid
+     * @param rid
+     * @return
+     */
     public Integer editRole(Long uid,Long rid){
         userMapper.editRoleDel(uid);
         return userMapper.editRoleAdd(uid,rid);

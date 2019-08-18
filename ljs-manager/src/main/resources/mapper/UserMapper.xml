@@ -22,14 +22,25 @@
         order by id desc
     </select>
 
+    <!-- 根据登录名查询用户 -->
     <select id="findUserByLoginName" resultType="userInfo">
         select * from base_user where loginName=#{loginName}
     </select>
 
+    <!-- 根据手机号查询用户 -->
+    <select id="findUserByTel" resultType="userInfo">
+        select * from base_user where tel=#{tel}
+    </select>
+
+    <!-- 根据邮箱账号查询用户 -->
+    <select id="findUserByEmail" resultType="userInfo">
+        select * from base_user where email=#{email}
+    </select>
+
     <!--添加用户-->
     <insert id="addUser">
-        insert into base_user(id,userName,loginName,password,sex,tel,createTime,imgUrl)
-        values (#{id},#{userName},#{loginName},#{password},#{sex},#{tel},NOW(),#{imgUrl})
+        insert into base_user(id,userName,loginName,password,sex,tel,createTime,imgUrl,email)
+        values (#{id},#{userName},#{loginName},#{password},#{sex},#{tel},NOW(),#{imgUrl},#{email})
     </insert>
 
     <!--修改用户-->
@@ -41,7 +52,8 @@
           password=#{password},
           sex=#{sex},
           tel=#{tel},
-          createTime=now()
+          createTime=now(),
+          email=#{email}
           <if test="imgUrl != null and imgUrl != ''">
               ,imgUrl=#{imgUrl}
           </if>

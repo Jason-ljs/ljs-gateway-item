@@ -23,6 +23,12 @@ public interface UserMapper {
     //根据用户登录名查询
     public UserInfo findUserByLoginName(@Param("loginName") String loginName);
 
+    //根据手机号查询用户
+    public UserInfo findUserByTel(@Param("tel") String tel);
+
+    //根据邮箱账号查询用户
+    public UserInfo findUserByEmail(@Param("email") String email);
+
     //增加用户
     public Integer addUser(UserInfo userInfo);
 

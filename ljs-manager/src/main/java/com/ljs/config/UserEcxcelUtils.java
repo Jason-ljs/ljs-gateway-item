@@ -49,6 +49,7 @@ public class UserEcxcelUtils {
             String password = row.getCell(2).getStringCellValue();
             String sex = row.getCell(3).getStringCellValue();
             String tel = row.getCell(4).getStringCellValue();
+            String email = row.getCell(5).getStringCellValue();
 
             //创建对象
             UserInfo userInfo = new UserInfo();
@@ -58,6 +59,7 @@ public class UserEcxcelUtils {
             userInfo.setPassword(MD5.encryptPassword(password, "ljs"));
             userInfo.setSex(sex);
             userInfo.setTel(tel);
+            userInfo.setEmail(email);
             userInfo.setCreateTime(new Date());
 
             //加入到集合

@@ -126,6 +126,16 @@ public class UserController {
             responseResult.setError("用户登录名重复");
             return responseResult;
         }
+        if (userInfoService.findUserByTel(userInfo.getTel()) != null) {
+            responseResult.setCode(500);
+            responseResult.setError("用户手机号重复");
+            return responseResult;
+        }
+        if (userInfoService.findUserByEmail(userInfo.getEmail()) != null) {
+            responseResult.setCode(500);
+            responseResult.setError("用户邮箱账号重复");
+            return responseResult;
+        }
         //给id赋值
         userInfo.setId(UID.next());
         //加密密码
@@ -154,9 +164,25 @@ public class UserController {
     )
     @RequestMapping("updateUser")
     public ResponseResult updateUser(@RequestBody UserInfo userInfo) {
+        ResponseResult responseResult = ResponseResult.getResponseResult();
+        //唯一性验证
+        if (userInfoService.findUserByLoginName(userInfo.getLoginName()) != null) {
+            responseResult.setCode(500);
+            responseResult.setError("用户登录名重复");
+            return responseResult;
+        }
+        if (userInfoService.findUserByTel(userInfo.getTel()) != null) {
+            responseResult.setCode(500);
+            responseResult.setError("用户手机号重复");
+            return responseResult;
+        }
+        if (userInfoService.findUserByEmail(userInfo.getEmail()) != null) {
+            responseResult.setCode(500);
+            responseResult.setError("用户邮箱账号重复");
+            return responseResult;
+        }
         //加密密码
         userInfo.setPassword(MD5.encryptPassword(userInfo.getPassword(), "ljs"));
-        ResponseResult responseResult = ResponseResult.getResponseResult();
         if (userInfoService.updateUser(userInfo) > 0) {
             responseResult.setCode(200);
             responseResult.setSuccess("修改用户成功");
@@ -270,6 +296,7 @@ public class UserController {
      */
     @RequestMapping("opinionData")
     public Map<String,Object> opinionData() throws ParseException {
+        //获取2019-开头的所有键
         Set<String> keys = redisTemplate.keys("2019-*");
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         Set<Date> treeSet = new TreeSet();
