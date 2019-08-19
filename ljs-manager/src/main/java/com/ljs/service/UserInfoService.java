@@ -75,6 +75,7 @@ public class UserInfoService {
      * @return
      */
     public Integer addUser(UserInfo userInfo){
+        userMapper.editRoleAdd(userInfo.getId(),12L);
         return userMapper.addUser(userInfo);
     }
 

@@ -166,17 +166,20 @@ public class UserController {
     public ResponseResult updateUser(@RequestBody UserInfo userInfo) {
         ResponseResult responseResult = ResponseResult.getResponseResult();
         //唯一性验证
-        if (userInfoService.findUserByLoginName(userInfo.getLoginName()) != null) {
+        UserInfo userByLoginName = userInfoService.findUserByLoginName(userInfo.getLoginName());
+        if (userByLoginName != null && !userInfo.getId().equals(userByLoginName.getId())) {
             responseResult.setCode(500);
             responseResult.setError("用户登录名重复");
             return responseResult;
         }
-        if (userInfoService.findUserByTel(userInfo.getTel()) != null) {
+        UserInfo userByTel = userInfoService.findUserByTel(userInfo.getTel());
+        if (userByTel != null && !userInfo.getId().equals(userByTel.getId())) {
             responseResult.setCode(500);
             responseResult.setError("用户手机号重复");
             return responseResult;
         }
-        if (userInfoService.findUserByEmail(userInfo.getEmail()) != null) {
+        UserInfo userByEmail = userInfoService.findUserByEmail(userInfo.getEmail());
+        if (userByEmail != null && !userInfo.getId().equals(userByEmail.getId())) {
             responseResult.setCode(500);
             responseResult.setError("用户邮箱账号重复");
             return responseResult;
@@ -240,6 +243,10 @@ public class UserController {
         Thumbnails.of(filePath).scale(0.25f).toFile(fileImg.getAbsolutePath() + "_sl.jpg");
     }
 
+    /**
+     * 测试使用FDFS保存图片
+     * @throws FileNotFoundException
+     */
     @RequestMapping("test")
     public void test() throws FileNotFoundException {
         File file = new File("D:\\IMG\\此电脑.png_sl.jpg");

@@ -388,6 +388,11 @@ public class AuthController {
         return responseResult;
     }
 
+    /**
+     * 修改密码
+     * @param map
+     * @return
+     */
     @RequestMapping("resetPwd")
     @ResponseBody
     public ResponseResult resetPwd(@RequestBody Map<String, String> map) {
