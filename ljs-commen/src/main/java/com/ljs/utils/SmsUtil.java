@@ -28,10 +28,10 @@ public class SmsUtil {
     public static String sendSms(String phoneNumber, String code) {
 
         //AccessKeyId
-        String accessKeyId = "LTAIJi0Zhw2rVPHs";
+        String accessKeyId = "LTAIJi0Zhw2rV";
 
         //AccessKeySecret
-        String secret = "4yW5YQGvt1yeWUiVQpOzInRoHDI2HS";
+        String secret = "4yW5YQGvt1yeWUiVQpOzInRoHDI";
 
         //短信签名
         String signName = "JasonItem";
