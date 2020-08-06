@@ -28,16 +28,16 @@ public class SmsUtil {
     public static String sendSms(String phoneNumber, String code) {
 
         //AccessKeyId
-        String accessKeyId = "LTAIJi0Zhw2rV";
+        String accessKeyId = "AccessKeyId";
 
         //AccessKeySecret
-        String secret = "4yW5YQGvt1yeWUiVQpOzInRoHDI";
+        String secret = "AccessKeySecret";
 
         //短信签名
-        String signName = "JasonItem";
+        String signName = "短信签名";
 
         //短信模板
-        String templateCode = "SMS_172357028";
+        String templateCode = "短信模板";
 
 
         //设置超时时间
